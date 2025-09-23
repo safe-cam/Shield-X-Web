@@ -80,7 +80,7 @@ export default function Login() {
 
 
         <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <button className="link" type="button" onClick={() => navigate('/Signup')}>Already have an account? <span style={{ color: 'red' }}>Sign Up</span></button>
+          <button className="link" type="button" onClick={() => navigate('/Signup')}>Don't have an account? <span style={{ color: 'red' }}>Sign Up</span></button>
         </div>
       </form>
 
