@@ -1,0 +1,49 @@
+# labeler "simple" schema for React app
+# Comments are applied to both issues and pull requests.
+comment: |
+  👍 Thanks for this!
+  🏷 I have applied any labels matching special text in your issue/PR.
+
+  Please review the labels and make any necessary changes.
+
+# Labels object with regex patterns to match title + body
+labels:
+  'bug':
+    - '^fix\(.+\): .+'
+  'feat':
+    - '^feat\(.+\): .+'
+  'chore':
+    - '^chore\(.+\): .+'
+
+file_labels:
+  'Components':
+    - '.*src/components/.*'
+    - '.*src/ui/.*'
+  'Pages':
+    - '.*src/pages/.*'
+    - '.*src/views/.*'
+  'Hooks':
+    - '.*src/hooks/.*'
+  'Styles':
+    - '.*src/styles/.*'
+    - '.*src/css/.*'
+  'Assets':
+    - '.*public/.*'
+    - '.*src/assets/.*'
+  'State':
+    - '.*src/store/.*'
+    - '.*src/redux/.*'
+    - '.*src/context/.*'
+  'API':
+    - '.*src/api/.*'
+    - '.*src/services/.*'
+  'Tests':
+    - '.*__tests__/.*'
+    - '.*src/tests/.*'
+  'CI':
+    - '.*\.github/workflows/.*'
+    - '.*ci/.*'
+  'Docs':
+    - '.*docs/.*'
+    - '.*README.*'
+
