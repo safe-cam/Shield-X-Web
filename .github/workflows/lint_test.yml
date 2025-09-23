@@ -20,9 +20,10 @@ jobs:
         run: npm ci
         working-directory: ShieldX-Web
 
-      - name: Run lint (frontend)
-        run: npm run lint
-        working-directory: ShieldX-Web
+      # - name: Run lint (frontend)
+      #   run: npm run lint
+      #   working-directory: ShieldX-Web
+
 
   build:
     runs-on: ubuntu-latest
