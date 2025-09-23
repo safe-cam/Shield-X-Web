@@ -25,3 +25,8 @@ jobs:
       
       - name: Build app
         run: npm run build
+      
+      - name: Deploy to Vercel
+        if: github.ref == 'refs/heads/prod'
+        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_fuK5pue8gltd9Hcwr9tLyx6ol0LO/omlooaTxF1
+
