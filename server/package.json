@@ -5,9 +5,10 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-  "start": "node src/index.js",
-  "dev": "NODE_ENV=development nodemon src/index.js",
-  "dev:win": "set NODE_ENV=development&& nodemon src/index.js"
+    "start": "node src/index.js",
+    "dev": "NODE_ENV=development nodemon src/index.js",
+    "dev:win": "set NODE_ENV=development&& nodemon src/index.js",
+    "lint": "eslint src/**/*.js src/**/*.jsx"
   },
   "author": "",
   "license": "MIT",
@@ -20,6 +21,7 @@
     "mongoose": "^7.3.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "eslint": "^9.36.0",
+    "nodemon": "^3.1.10"
   }
 }
