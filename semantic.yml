@@ -1,0 +1,34 @@
+#   feat(ui): Add `Button` component
+#   ^    ^    ^
+#   |    |    |__ Subject
+#   |    |_______ Scope
+#   |____________ Type
+
+titleOnly: true
+types:
+  - feat
+  - fix
+  - docs
+  - style
+  - refactor
+  - perf
+  - test
+  - chore
+  - revert
+  - ci
+  - infra
+  - release
+scopes:
+  - autopilot
+  - ml
+  - notifications
+  - ui
+  - tickets
+  - relay
+  - collector
+  - deps
+  - NB-\d+
+  - nb-\d+
+requireScope: false
+
+#subjectPattern: ^(?![A-Z]).+$
