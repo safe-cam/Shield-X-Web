@@ -14,6 +14,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+<<<<<<< Updated upstream
           node-version: 22
 
       - name: Install deps (web)
@@ -23,6 +24,17 @@ jobs:
       - name: Run lint
         run: npm run lint
         working-directory: web
+=======
+          node-version: 22.17.1
+
+      - name: Install dependencies (frontend)
+        run: npm ci
+        working-directory: ShieldX-Web
+
+      - name: Run lint (frontend)
+        run: npm run lint
+        working-directory: ShieldX-Web
+>>>>>>> Stashed changes
 
   build:
     runs-on: ubuntu-latest
@@ -32,6 +44,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
+<<<<<<< Updated upstream
           node-version: 22
 
       - name: Install deps (web)
@@ -41,3 +54,14 @@ jobs:
       - name: Build app (web)
         run: npm run build
         working-directory: web
+=======
+          node-version: 22.17.1
+
+      - name: Install dependencies (frontend)
+        run: npm ci
+        working-directory: ShieldX-Web
+
+      - name: Build app (frontend)
+        run: npm run build
+        working-directory: ShieldX-Web
+>>>>>>> Stashed changes
