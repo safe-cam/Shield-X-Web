@@ -5,7 +5,6 @@ import User from '../models/UserR.js';
 import authMiddleware from '../middleware/authmiddleware.js';
 
 
-
 const router = express.Router();
 
 // Register
@@ -43,6 +42,19 @@ router.post('/login', async (req, res) => {
   }
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // After 1 hour, the token becomes invalid
   res.json({ token, user: { id: user._id, username: user.username, name: user.name } });
+});
+
+
+// Protected route: return current user info (uses authMiddleware)
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.json({ user: { id: user._id, username: user.username, name: user.name } });
+  } catch (err) {
+    console.error('Get /me error', err && err.message ? err.message : err);
+    return res.status(500).json({ message: 'Server error' });
+  }
 });
 
 
