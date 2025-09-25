@@ -2,9 +2,14 @@ name: React CI - build and test
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main 
+      - prod
+
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - prod
 
 jobs:
   build:
@@ -19,13 +24,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Install dependencies (frontend)
         run: npm ci
+        working-directory: ShieldX-Web
 
-      
-      - name: Build app
+      - name: Build app (frontend)
         run: npm run build
-      
+        working-directory: ShieldX-Web
+
       - name: Deploy to Vercel
         if: github.ref == 'refs/heads/prod'
-        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/{{ secrets.VERCEL_PROD_HOOK }}
+        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/${{ secrets.VERCEL_PROD_HOOK }}
