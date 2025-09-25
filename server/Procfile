@@ -1,0 +1,2 @@
+# Instruct Render to start the server from the src entrypoint
+web: node src/index.js

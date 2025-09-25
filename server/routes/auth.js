@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import User from '../models/UserR.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
-
 const router = express.Router();
 
 // Register
