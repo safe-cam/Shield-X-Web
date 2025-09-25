@@ -5,10 +5,6 @@ import User from '../models/UserR.js';
 import authMiddleware from '../middleware/authmiddleware.js';
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
 const router = express.Router();
 
 // Register
