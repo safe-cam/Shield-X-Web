@@ -35,7 +35,20 @@ export default function Profile() {
           dobDay: u.dobDay || '', dobMonth: u.dobMonth || '', dobYear: u.dobYear || '', gender: u.gender || ''
         })
         if (u.avatar) setAvatarPreview(u.avatar)
-        setContacts(u.contacts || [])
+        // merge any locally staged contacts (when user added while unauthenticated)
+        const serverContacts = u.contacts || []
+        let merged = serverContacts
+        try {
+          const localRaw = localStorage.getItem('localContacts')
+          const local = localRaw ? JSON.parse(localRaw) : []
+          if (Array.isArray(local) && local.length) {
+            // add local contacts that don't match by phone
+            const phones = new Set(serverContacts.map(x => (x.phone || '').toString()))
+            const additions = local.filter(x => !phones.has((x.phone || '').toString()))
+            merged = [...serverContacts, ...additions]
+          }
+        } catch (e) { /* ignore parse errors */ }
+        setContacts(merged)
       } catch (e) { console.error('Load profile', e) }
     }
 
@@ -53,7 +66,7 @@ export default function Profile() {
 
   const triggerFile = () => fileRef.current && fileRef.current.click()
 
-  const save = async () => {
+  const save = async (contactsOverride) => {
     // Persist to backend
     const api = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL)
       || (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL)
@@ -62,9 +75,21 @@ export default function Profile() {
       const raw = localStorage.getItem('authUser')
       const parsed = raw ? JSON.parse(raw) : null
       const token = parsed && parsed.token
-      if (!token) { alert('Not authenticated'); return }
+      if (!token) {
+        // Persist contacts locally so user doesn't lose them.
+        try {
+          const toSave = (typeof contactsOverride !== 'undefined' ? contactsOverride : contacts) || []
+          localStorage.setItem('localContacts', JSON.stringify(toSave))
+          setContacts(toSave)
+          alert('Saved locally. Sign in to sync these with your account.')
+        } catch (e) {
+          console.error('Failed to save contacts locally', e)
+          alert('Not authenticated. Could not save.')
+        }
+        return
+      }
       const base = String(api).replace(/\/$/, '')
-      const payload = { ...form, contacts }
+      const payload = { ...form, contacts: (typeof contactsOverride !== 'undefined' ? contactsOverride : contacts) }
       if (avatarPreview) payload.avatar = avatarPreview
       const res = await fetch(base + '/api/profile', {
         method: 'PUT',
@@ -72,12 +97,14 @@ export default function Profile() {
         body: JSON.stringify(payload)
       })
       const body = await res.json()
-      if (!res.ok) { alert(body.message || 'Save failed'); console.error(body); return }
+  if (!res.ok) { alert(body.message || 'Save failed'); console.error(body); return }
       const u = body.user || {}
       setUser({ id: u.id || u._id || '', username: u.username || '', name: u.name || '', email: u.email || '', contact: u.contact || '' })
       setForm({ name: u.name || '', username: u.username || '', contact: u.contact || '', email: u.email || '', dobDay: u.dobDay || '', dobMonth: u.dobMonth || '', dobYear: u.dobYear || '', gender: u.gender || '' })
       setContacts(u.contacts || [])
       if (u.avatar) setAvatarPreview(u.avatar)
+  // successful server save — clear any locally staged contacts
+  try { localStorage.removeItem('localContacts') } catch (e) { /* ignore */ }
       // keep token in localStorage but update user fields
       try {
         const raw2 = localStorage.getItem('authUser')
@@ -93,14 +120,56 @@ export default function Profile() {
     const arr = [...contacts, { id: Date.now().toString(), name: c.name, phone: c.phone }]
     setContacts(arr)
     // persist immediately
-    save()
+    save(arr)
   }
 
   const removeContact = (id) => {
     const arr = contacts.filter(x => x.id !== id)
     setContacts(arr)
     // persist immediately
-    save()
+    save(arr)
+  }
+
+  // Quick actions: call / sms with desktop fallback (copy to clipboard)
+  const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent || '')
+
+  const normalizePhone = (phone) => (phone || '').toString().trim().replace(/[^+\d]/g, '')
+
+  const handleCall = async (phone) => {
+    const p = normalizePhone(phone)
+    if (!p) { alert('No phone number'); return }
+    const href = 'tel:' + p
+    if (isMobile) {
+      window.location.href = href
+      return
+    }
+    // desktop fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(phone)
+      alert('Phone number copied to clipboard. Paste it on your phone to call: ' + phone)
+    } catch (e) {
+      // final fallback: show prompt so user can copy
+      // NOTE: prompt returns the value but user will copy manually
+      // eslint-disable-next-line no-alert
+      window.prompt('Copy phone number', phone)
+    }
+  }
+
+  const handleSms = async (phone) => {
+    const p = normalizePhone(phone)
+    if (!p) { alert('No phone number'); return }
+    const href = 'sms:' + p
+    if (isMobile) {
+      window.location.href = href
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(phone)
+      alert('Phone number copied to clipboard. Paste it on your phone to send SMS: ' + phone)
+    } catch (e) {
+      // eslint-disable-next-line no-alert
+      window.prompt('Copy phone number', phone)
+    }
   }
 
   return (
@@ -171,12 +240,14 @@ export default function Profile() {
         {contacts.length === 0 && <div className="empty-queued">No emergency contacts yet.</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
           {contacts.map(c => (
-            <div key={c.id} className="list-item">
+            <div key={c.id} className="list-item" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontWeight: 700 }}>{c.name}</div>
                 <div style={{ color: '#666' }}>{c.phone}</div>
               </div>
-              <div style={{ marginLeft: 8 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button className="btn tiny" onClick={() => handleCall(c.phone)} aria-label={`Call ${c.name}`}>Call</button>
+                <button className="btn tiny outline" onClick={() => handleSms(c.phone)} aria-label={`SMS ${c.name}`}>SMS</button>
                 <button className="btn tiny" onClick={() => removeContact(c.id)}>Remove</button>
               </div>
             </div>
