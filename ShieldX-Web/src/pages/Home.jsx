@@ -24,6 +24,21 @@ export default function Home() {
     timerRef.current = setTimeout(() => { setStatus('Help Arrived'); setPanicActive(false) }, 6000)
   }
 
+  // load user from localStorage to show avatar
+  const [user, setUser] = useState(null)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('authUser')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        setUser(parsed)
+      }
+    } catch (e) { /* ignore */ }
+  }, [])
+
+  const initials = (user?.name || user?.username || 'U').split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase()
+  const avatar = user?.avatar || null
+
   return (
     <div className="safe-area">
       <header className="header-row">
@@ -32,7 +47,12 @@ export default function Home() {
           <FiShield size={28} color="#E53935" style={{ marginRight: 8 }} />
           <div className="header-title">AI Police Alert</div>
         </div>
-  <button className="header-icon"><MdSettings size={18} color="#222" /></button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button className="header-icon" onClick={() => navigate('/profile')} title="Settings"><MdSettings size={18} color="#222" /></button>
+          <button className="avatar-circle" onClick={() => navigate('/profile')} title="Profile" style={{ width: 36, height: 36, borderRadius: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {avatar ? <img src={avatar} alt="me" style={{ width: 36, height: 36, borderRadius: 18, objectFit: 'cover' }} /> : initials}
+          </button>
+        </div>
       </header>
 
       <div className={`status-bar ${panicActive ? 'panic' : ''}`}>

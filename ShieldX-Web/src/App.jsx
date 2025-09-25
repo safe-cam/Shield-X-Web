@@ -7,7 +7,11 @@ import Chat from './pages/Chat'
 import Location from './pages/Location'
 import Alerts from './pages/Alerts'
 import Evidence from './pages/Evidence'
+import Profile from './pages/Profile'
 import BottomTabs from './components/BottomTabs'
+import AlertPreferences from './pages/AlertPreferences'
+import PrivacySettings from './pages/PrivacySettings'
+import Settings from './pages/Settings'
 
 export default function App() {
   const isAuth = () => !!localStorage.getItem('authUser')
@@ -28,6 +32,10 @@ export default function App() {
           <Route path="/location" element={<ProtectedRoute><Location /></ProtectedRoute>} />
           <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
           <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/alerts" element={<ProtectedRoute><AlertPreferences /></ProtectedRoute>} />
+          <Route path="/profile/privacy" element={<ProtectedRoute><PrivacySettings /></ProtectedRoute>} />
+          <Route path="/profile/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         </Routes>
       </main>
       {isAuth() && <BottomTabs />}

@@ -50,9 +50,25 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
-    return res.json({ user: { id: user._id, username: user.username, name: user.name } });
+    return res.json({ user: { id: user._id, username: user.username, name: user.name, email: user.email, contact: user.contact, avatar: user.avatar, dobDay: user.dobDay, dobMonth: user.dobMonth, dobYear: user.dobYear, gender: user.gender, contacts: user.contacts } });
   } catch (err) {
     console.error('Get /me error', err && err.message ? err.message : err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// Update profile
+router.put('/profile', authMiddleware, async (req, res) => {
+  try {
+    const updates = {};
+    const allowed = ['name', 'email', 'contact', 'avatar', 'dobDay', 'dobMonth', 'dobYear', 'gender', 'contacts', 'username'];
+    for (const k of allowed) if (req.body[k] !== undefined) updates[k] = req.body[k];
+    const user = await User.findByIdAndUpdate(req.user.id, { $set: updates }, { new: true }).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    return res.json({ user: { id: user._id, username: user.username, name: user.name, email: user.email, contact: user.contact, avatar: user.avatar, dobDay: user.dobDay, dobMonth: user.dobMonth, dobYear: user.dobYear, gender: user.gender, contacts: user.contacts } });
+  } catch (err) {
+    console.error('Update profile error', err && err.message ? err.message : err);
     return res.status(500).json({ message: 'Server error' });
   }
 });
